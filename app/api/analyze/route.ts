@@ -3,10 +3,30 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      const status = err?.status ?? err?.httpStatusCode ?? err?.code;
+      if (status === 429 && i < retries - 1) {
+        // Google's retryDelay is typically 30-60s on free tier
+        // so we need much longer waits: 15s, 30s, 60s
+        const wait = Math.pow(2, i) * 15000;
+        console.log(`Rate limited (attempt ${i + 1}/${retries}). Retrying in ${wait / 1000}s...`);
+        await delay(wait);
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 const SYSTEM_PROMPT = `You are Dr. VERITY, an expert forensic linguist and behavioral deception analyst. Analyze text for deception markers based on Statement Validity Analysis (SVA) and SCAN methodology.
-
 Analyze for: hedging, distancing, over-explanation, qualifier words (honestly/I swear/believe me), filler words, tense-shifts, formal denials (I did not vs I didn't), inconsistencies, emotional flatness, and memory qualification.
-
 Return ONLY valid JSON, no markdown.`;
 
 const SCHEMA = `{
@@ -32,14 +52,26 @@ export async function POST(req: NextRequest) {
       systemInstruction: SYSTEM_PROMPT,
     });
 
-    const result = await model.generateContent(
-      `Analyze this statement and return JSON matching this schema:\n${SCHEMA}\n\nStatement: "${text}"`
+    const result = await withRetry(() =>
+      model.generateContent(
+        `Analyze this statement and return JSON matching this schema:\n${SCHEMA}\n\nStatement: "${text}"`
+      )
     );
 
     const analysis = JSON.parse(result.response.text());
     return NextResponse.json(analysis);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Analysis error:', error);
+
+    // Give the user a clearer message if it's still rate limited after retries
+    const status = error?.status ?? error?.httpStatusCode;
+    if (status === 429) {
+      return NextResponse.json(
+        { error: 'Google API rate limit reached. Please wait about a minute and try again.' },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json({ error: 'Analysis failed. Check your GOOGLE_API_KEY in .env.local' }, { status: 500 });
   }
 }
