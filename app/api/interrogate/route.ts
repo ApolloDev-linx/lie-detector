@@ -2,8 +2,6 @@ import OpenAI from 'openai';
 import { NextRequest, NextResponse } from 'next/server';
 import type { InterrogationScenario, InterrogationMessage } from '@/lib/types';
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 function buildSuspectSystemPrompt(scenario: InterrogationScenario): string {
   const guiltyInstructions = `
 You ARE guilty. Your behavioral rules:
@@ -24,18 +22,12 @@ You are NOT guilty. Your behavioral rules:
 - Don't over-explain or over-qualify — you're just telling the truth`;
 
   return `You are roleplaying as ${scenario.suspectName} in a police/HR interrogation scenario.
-
 SCENARIO: ${scenario.setup}
-
 YOUR CHARACTER: ${scenario.suspectPersona}
-
 YOUR BACKSTORY (known only to you): ${scenario.backstory}
-
 GUILT STATUS: ${scenario.isGuilty ? 'YOU ARE GUILTY.' : 'YOU ARE INNOCENT.'}
 ${scenario.isGuilty ? guiltyInstructions : innocentInstructions}
-
 AVAILABLE EVIDENCE THE DETECTIVE MAY REFERENCE: ${scenario.evidence.join('; ')}
-
 ROLEPLAY RULES:
 - Keep responses to 2-4 sentences — interrogation answers are short
 - Stay completely in character; never break the fourth wall
@@ -53,6 +45,8 @@ Analyze it briefly for deception patterns and return ONLY valid JSON (no markdow
 Keep flags to 2-4 words each, maximum 3 flags. If no flags, return empty array.`;
 
 export async function POST(req: NextRequest) {
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
   try {
     const { scenario, messages, newMessage } = await req.json() as {
       scenario: InterrogationScenario;
@@ -99,7 +93,6 @@ export async function POST(req: NextRequest) {
     });
 
     const analysisRaw = analysisResponse.choices[0]?.message?.content || '{}';
-
     let analysis = { deceptionScore: 0, flags: [] as string[] };
     try {
       analysis = JSON.parse(analysisRaw);
