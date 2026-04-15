@@ -17,10 +17,23 @@ interface UseSpeechReturn extends SpeechState {
 }
 
 // Extend Window for browser Speech API
+interface ISpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: new () => ISpeechRecognition;
+    webkitSpeechRecognition: new () => ISpeechRecognition;
   }
 }
 
@@ -33,7 +46,7 @@ export function useSpeech(): UseSpeechReturn {
     error: null,
   });
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
 
   useEffect(() => {
     const SpeechRecognitionAPI =
@@ -50,7 +63,7 @@ export function useSpeech(): UseSpeechReturn {
       recognition.lang = 'en-US';
       recognition.maxAlternatives = 1;
 
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
+      recognition.onresult = (event: any) => {
         let final = '';
         let interim = '';
 
@@ -70,11 +83,14 @@ export function useSpeech(): UseSpeechReturn {
         }));
       };
 
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      recognition.onerror = (event: any) => {
         setState((s) => ({
           ...s,
           isListening: false,
-          error: event.error === 'not-allowed' ? 'Microphone access denied.' : `Speech error: ${event.error}`,
+          error:
+            event.error === 'not-allowed'
+              ? 'Microphone access denied.'
+              : `Speech error: ${event.error}`,
         }));
       };
 

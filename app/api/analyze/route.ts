@@ -5,17 +5,17 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
-  for (let i = 0; i < retries; i++) {
+const RETRY_DELAYS = [30000, 60000, 90000, 120000]; // 30s, 60s, 90s, 120s
+
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  for (let i = 0; i <= RETRY_DELAYS.length; i++) {
     try {
       return await fn();
     } catch (err: any) {
       const status = err?.status ?? err?.httpStatusCode ?? err?.code;
-      if (status === 429 && i < retries - 1) {
-        // Google's retryDelay is typically 30-60s on free tier
-        // so we need much longer waits: 15s, 30s, 60s
-        const wait = Math.pow(2, i) * 15000;
-        console.log(`Rate limited (attempt ${i + 1}/${retries}). Retrying in ${wait / 1000}s...`);
+      if (status === 429 && i < RETRY_DELAYS.length) {
+        const wait = RETRY_DELAYS[i];
+        console.log(`Rate limited (attempt ${i + 1}/${RETRY_DELAYS.length + 1}). Retrying in ${wait / 1000}s...`);
         await delay(wait);
         continue;
       }
@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Analysis error:', error);
 
-    // Give the user a clearer message if it's still rate limited after retries
     const status = error?.status ?? error?.httpStatusCode;
     if (status === 429) {
       return NextResponse.json(
