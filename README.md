@@ -6,7 +6,7 @@
 
 ---
 
-## 🧠 What It Does
+## What It Does
 
 VERITY analyzes text for **evidence-based behavioral deception patterns** — it doesn't claim to "detect lies" magically. Every flag comes with an explanation of *why* it's suspicious, grounded in real linguistic research (Statement Validity Analysis, SCAN methodology, cognitive load research).
 
@@ -34,7 +34,7 @@ VERITY analyzes text for **evidence-based behavioral deception patterns** — it
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone and install
 
@@ -68,7 +68,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 ai-lie-detector/
@@ -121,7 +121,7 @@ ai-lie-detector/
 
 ---
 
-## 🌐 API Reference
+##  API Reference
 
 ### `POST /api/analyze`
 
@@ -178,7 +178,7 @@ ai-lie-detector/
 
 ---
 
-## 🎨 Design System
+##  Design System
 
 **Palette:**
 - `#060A10` — Background base
@@ -219,6 +219,6 @@ Use for educational purposes, creative writing, research, and entertainment only
 
 ---
 
-## 📄 License
+##  License
 
 MIT — use freely, modify boldly.
