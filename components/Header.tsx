@@ -33,19 +33,19 @@ const MODES: { id: AppMode; label: string; icon: React.ReactNode; description: s
 export default function Header({ mode, onModeChange }: HeaderProps) {
   return (
     <header className="relative border-b border-[#1A2840] bg-[#060A10]/90 backdrop-blur-sm sticky top-0 z-50 scan-line-effect">
-      <div className="max-w-7xl mx-auto px-4 py-0">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-0">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <div className="relative">
               <Activity className="w-5 h-5 text-[#00CFFF]" strokeWidth={2.5} />
               <div className="absolute -inset-1 bg-[#00CFFF]/10 rounded-full blur-sm" />
             </div>
             <div>
-              <span className="font-display text-[#E2EAF4] text-lg font-700 tracking-[0.2em]">
+              <span className="font-display text-[#E2EAF4] text-base sm:text-lg font-700 tracking-[0.2em]">
                 VERITY
               </span>
-              <span className="font-mono text-[10px] text-[#3D5166] block leading-none tracking-[0.15em]">
+              <span className="font-mono text-[10px] text-[#3D5166] hidden sm:block leading-none tracking-[0.15em]">
                 BEHAVIORAL ANALYSIS v2.0
               </span>
             </div>
@@ -58,7 +58,7 @@ export default function Header({ mode, onModeChange }: HeaderProps) {
                 key={m.id}
                 onClick={() => onModeChange(m.id)}
                 className={`
-                  relative flex items-center gap-2 px-4 py-2 rounded text-xs font-display tracking-widest
+                  relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded text-[10px] sm:text-xs font-display tracking-widest
                   transition-all duration-200 group
                   ${mode === m.id
                     ? 'text-[#00CFFF] bg-[#00CFFF]/8 border border-[#00CFFF]/20'
@@ -69,7 +69,8 @@ export default function Header({ mode, onModeChange }: HeaderProps) {
                 <span className={`transition-colors ${mode === m.id ? 'text-[#00CFFF]' : 'text-[#3D5166] group-hover:text-[#7A8FA6]'}`}>
                   {m.icon}
                 </span>
-                {m.label}
+                <span className="hidden sm:inline">{m.label}</span>
+                <span className="sm:hidden">{m.label.slice(0, 3)}</span>
                 {mode === m.id && (
                   <motion.div
                     layoutId="active-tab-indicator"
