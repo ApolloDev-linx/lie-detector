@@ -1,5 +1,4 @@
 'use client';
-
 import { motion } from 'framer-motion';
 import { ScanSearch, BookOpen, MessageSquareWarning, Activity } from 'lucide-react';
 import type { AppMode } from '@/lib/types';
@@ -82,11 +81,17 @@ export default function Header({ mode, onModeChange }: HeaderProps) {
             ))}
           </nav>
 
-          {/* Status */}
-          <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-[#3D5166] tracking-widest">
+          {/* Powered by Apollo Systems */}
+          <a
+            href="https://www.apollosystems.tech/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-[#3D5166] tracking-widest hover:text-[#00CFFF] transition-colors duration-200 shrink-0"
+          >
             <div className="status-dot" />
-            SYSTEM ONLINE
-          </div>
+            <span className="hidden sm:inline">POWERED BY APOLLO SYSTEMS</span>
+            <span className="sm:hidden">APOLLO SYS</span>
+          </a>
         </div>
       </div>
     </header>
