@@ -194,7 +194,7 @@ ai-lie-detector/
 
 ---
 
-## ⚖️ Important Disclaimer
+##  Important Disclaimer
 
 VERITY is a **linguistic pattern analysis tool** — not a verified lie detection system. Deception analysis based on language patterns alone has significant limitations:
 
@@ -207,7 +207,7 @@ Use for educational purposes, creative writing, research, and entertainment only
 
 ---
 
-## 🔧 Extending the App
+##  Extending the App
 
 **Add more training scenarios** → `lib/constants.ts` — `TRAINING_SCENARIOS` array
 
