@@ -20,7 +20,7 @@ VERITY analyzes text for **evidence-based behavioral deception patterns** — it
 
 ---
 
-## ⚙️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |-------|------------|
